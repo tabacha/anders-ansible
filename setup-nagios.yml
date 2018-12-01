@@ -1,18 +1,29 @@
 - name: setup nagios
   hosts: ucs
+  vars:
+    nagios_commands:
+      - name: check_nut
+        params: apc -w 90 -c 80 -t 30 -T 35 -l 30 -L 50
+        check_hosts:
+           - dumbldedore.anders.hamburg
+      
   tasks:
     - name: copy check_nut
       copy:
-        src: check_nut
+        src: "{{ item.name }}"
         dest: /usr/local/nagios/
         mode: 0755
       register: copy_plugin
-    - name: copy check_nut.cfg
-      copy:
-        src: check_nut.cfg
-        dest: /etc/nagios-plugins/config/
+      with_items:
+        - "{{ nagios_commands }}"
+    - name: copy nagios_plguin.cfg
+      template:
+        src: nagios_plugin.cfg
+        dest: /etc/nagios-plugins/config/{{ item.name }}.cfg
         mode: 0644
       register: copy_nagios_cfg
+      with_items:
+        - "{{ nagios_commands }}"
     - name: restart univention-listener
       systemd:
         state: restarted
