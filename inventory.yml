@@ -1,0 +1,7 @@
+all:
+  children:
+    ucs:
+      hosts:   
+        gandalf.anders.hamburg:
+        ron.anders.hamburg:
+        dumbledore.anders.hamburg:

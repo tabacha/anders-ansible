@@ -1,0 +1,20 @@
+- name: setup nagios
+  hosts: ucs
+  tasks:
+    - name: copy check_nut
+      copy:
+        src: check_nut
+        dest: /usr/local/nagios/
+        mode: 0755
+      register: copy_plugin
+    - name: copy check_nut.cfg
+      copy:
+        src: check_nut.cfg
+        dest: /etc/nagios-plugins/config/
+        mode: 0644
+      register: copy_nagios_cfg
+    - name: restart univention-listener
+      systemd:
+        state: restarted
+        name: univention-directory-listener
+      when: copy_plugin.changed or copy_nagios_cfg.changed
